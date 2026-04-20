@@ -759,7 +759,21 @@ Start with a warm greeting! Ask her name if week 1.`;
 
             await sendTutorMessage();
         }
-
+const response = await fetch('/api/chat', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    apiKey: apiKey,
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1000,
+    system: systemPrompt || `Continue tutoring session for 9-year-old preparing for 11+ exams. Responses will be read aloud. Include [PROGRESS: XX%].`,
+    messages: messages.length > 0 ? messages : [
+      { role: 'user', content: 'Start the lesson!' }
+    ]
+  })
+});
         async function sendTutorMessage(systemPrompt = null, isStart = false) {
             const loading = document.getElementById('loading');
             loading.classList.add('active');
@@ -767,7 +781,7 @@ Start with a warm greeting! Ask her name if week 1.`;
             try {
                 const messages = isStart ? [] : [...conversationHistory];
                 
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
