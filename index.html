@@ -1,3 +1,5 @@
+Yes! Here's the complete updated code with voice preference saving:
+Delete everything in index.html and paste this:
 html<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -553,7 +555,8 @@ html<!DOCTYPE html>
                 voice.name.toLowerCase().includes('samantha') ||
                 voice.name.toLowerCase().includes('victoria') ||
                 voice.name.toLowerCase().includes('karen') ||
-                voice.name.toLowerCase().includes('zira')
+                voice.name.toLowerCase().includes('zira') ||
+                voice.name.toLowerCase().includes('hazel')
             );
             
             const voicesToShow = femaleVoices.length > 0 ? femaleVoices : englishVoices;
@@ -566,7 +569,26 @@ html<!DOCTYPE html>
             });
             
             if (voicesToShow.length > 0) {
-                selectedVoice = voicesToShow[0];
+                // Try to load saved voice preference
+                const savedVoiceName = localStorage.getItem('preferred_voice_name');
+                if (savedVoiceName) {
+                    const savedIndex = voicesToShow.findIndex(v => v.name === savedVoiceName);
+                    if (savedIndex >= 0) {
+                        selectedVoice = voicesToShow[savedIndex];
+                        voiceSelect.value = savedIndex;
+                    } else {
+                        selectedVoice = voicesToShow[0];
+                    }
+                } else {
+                    selectedVoice = voicesToShow[0];
+                }
+                
+                // Load saved speed preference
+                const savedSpeed = localStorage.getItem('preferred_speech_speed');
+                if (savedSpeed) {
+                    speechRate = parseFloat(savedSpeed);
+                    document.getElementById('speedSelect').value = savedSpeed;
+                }
             }
         }
 
@@ -579,11 +601,28 @@ html<!DOCTYPE html>
             const voiceSelect = document.getElementById('voiceSelect');
             const voices = speechSynthesis.getVoices();
             const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-            selectedVoice = englishVoices[voiceSelect.value];
+            const femaleVoices = englishVoices.filter(voice => 
+                voice.name.toLowerCase().includes('female') || 
+                voice.name.toLowerCase().includes('woman') ||
+                voice.name.toLowerCase().includes('samantha') ||
+                voice.name.toLowerCase().includes('victoria') ||
+                voice.name.toLowerCase().includes('karen') ||
+                voice.name.toLowerCase().includes('zira') ||
+                voice.name.toLowerCase().includes('hazel')
+            );
+            const voicesToShow = femaleVoices.length > 0 ? femaleVoices : englishVoices;
+            selectedVoice = voicesToShow[voiceSelect.value];
+            
+            // Save voice preference
+            if (selectedVoice) {
+                localStorage.setItem('preferred_voice_name', selectedVoice.name);
+            }
         }
 
         function updateSpeed() {
             speechRate = parseFloat(document.getElementById('speedSelect').value);
+            // Save speed preference
+            localStorage.setItem('preferred_speech_speed', speechRate.toString());
         }
 
         function toggleVoice() {
