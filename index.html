@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+Here's the complete corrected code - delete everything in index.html and paste this:
+html<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -759,21 +761,7 @@ Start with a warm greeting! Ask her name if week 1.`;
 
             await sendTutorMessage();
         }
-const response = await fetch('/api/chat', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    apiKey: apiKey,
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1000,
-    system: systemPrompt || `Continue tutoring session for 9-year-old preparing for 11+ exams. Responses will be read aloud. Include [PROGRESS: XX%].`,
-    messages: messages.length > 0 ? messages : [
-      { role: 'user', content: 'Start the lesson!' }
-    ]
-  })
-});
+
         async function sendTutorMessage(systemPrompt = null, isStart = false) {
             const loading = document.getElementById('loading');
             loading.classList.add('active');
@@ -781,14 +769,13 @@ const response = await fetch('/api/chat', {
             try {
                 const messages = isStart ? [] : [...conversationHistory];
                 
-                
+                const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': apiKey,
-                        'anthropic-version': '2023-06-01'
                     },
                     body: JSON.stringify({
+                        apiKey: apiKey,
                         model: 'claude-sonnet-4-20250514',
                         max_tokens: 1000,
                         system: systemPrompt || `Continue tutoring session for 9-year-old preparing for 11+ exams. Responses will be read aloud. Include [PROGRESS: XX%].`,
