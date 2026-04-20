@@ -546,39 +546,29 @@ html<!DOCTYPE html>
             const voiceSelect = document.getElementById('voiceSelect');
             voiceSelect.innerHTML = '';
             
+            // Show ALL English voices without filtering
             const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-            const femaleVoices = englishVoices.filter(voice => 
-                voice.name.toLowerCase().includes('female') || 
-                voice.name.toLowerCase().includes('woman') ||
-                voice.name.toLowerCase().includes('samantha') ||
-                voice.name.toLowerCase().includes('victoria') ||
-                voice.name.toLowerCase().includes('karen') ||
-                voice.name.toLowerCase().includes('zira') ||
-                voice.name.toLowerCase().includes('hazel')
-            );
             
-            const voicesToShow = femaleVoices.length > 0 ? femaleVoices : englishVoices;
-            
-            voicesToShow.forEach((voice, index) => {
+            englishVoices.forEach((voice, index) => {
                 const option = document.createElement('option');
                 option.value = index;
                 option.textContent = voice.name;
                 voiceSelect.appendChild(option);
             });
             
-            if (voicesToShow.length > 0) {
+            if (englishVoices.length > 0) {
                 // Try to load saved voice preference
                 const savedVoiceName = localStorage.getItem('preferred_voice_name');
                 if (savedVoiceName) {
-                    const savedIndex = voicesToShow.findIndex(v => v.name === savedVoiceName);
+                    const savedIndex = englishVoices.findIndex(v => v.name === savedVoiceName);
                     if (savedIndex >= 0) {
-                        selectedVoice = voicesToShow[savedIndex];
+                        selectedVoice = englishVoices[savedIndex];
                         voiceSelect.value = savedIndex;
                     } else {
-                        selectedVoice = voicesToShow[0];
+                        selectedVoice = englishVoices[0];
                     }
                 } else {
-                    selectedVoice = voicesToShow[0];
+                    selectedVoice = englishVoices[0];
                 }
                 
                 // Load saved speed preference
@@ -599,17 +589,7 @@ html<!DOCTYPE html>
             const voiceSelect = document.getElementById('voiceSelect');
             const voices = speechSynthesis.getVoices();
             const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-            const femaleVoices = englishVoices.filter(voice => 
-                voice.name.toLowerCase().includes('female') || 
-                voice.name.toLowerCase().includes('woman') ||
-                voice.name.toLowerCase().includes('samantha') ||
-                voice.name.toLowerCase().includes('victoria') ||
-                voice.name.toLowerCase().includes('karen') ||
-                voice.name.toLowerCase().includes('zira') ||
-                voice.name.toLowerCase().includes('hazel')
-            );
-            const voicesToShow = femaleVoices.length > 0 ? femaleVoices : englishVoices;
-            selectedVoice = voicesToShow[voiceSelect.value];
+            selectedVoice = englishVoices[voiceSelect.value];
             
             // Save voice preference
             if (selectedVoice) {
@@ -925,4 +905,4 @@ Start with a warm greeting! Ask her name if week 1.`;
         });
     </script>
 </body>
-</html>
+</html
