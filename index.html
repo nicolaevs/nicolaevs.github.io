@@ -1,9 +1,10 @@
+Here's the complete, clean, fresh version - delete everything in index.html and paste this:
 html<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>11+ Virtual Tutor with Voice</title>
+    <title>11+ Virtual Tutor</title>
     <style>
         * {
             margin: 0;
@@ -83,10 +84,6 @@ html<!DOCTYPE html>
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-        }
-
-        .api-key-input button:hover {
-            background: #218838;
         }
 
         .week-selector {
@@ -254,10 +251,6 @@ html<!DOCTYPE html>
 
         .message.tutor .message-content:hover .replay-button {
             opacity: 1;
-        }
-
-        .replay-button:hover {
-            background: #764ba2;
         }
 
         .tutor-avatar {
@@ -481,83 +474,36 @@ html<!DOCTYPE html>
         let currentWeek = 1;
         let lessonProgress = 0;
         let apiKey = null;
-        
         let speechEnabled = true;
-        let speechSynthesis = window.speechSynthesis;
         let selectedVoice = null;
         let speechRate = 1.0;
         let currentUtterance = null;
 
         const lessonPlans = {
-            1: {
-                subject: "Introduction & Verbal Reasoning Basics",
-                duration: 60,
-                topics: ["Synonyms and antonyms", "Word relationships", "Simple analogies"]
-            },
-            2: {
-                subject: "Non-Verbal Reasoning Patterns",
-                duration: 60,
-                topics: ["Shape sequences", "Pattern completion", "Odd one out"]
-            },
-            3: {
-                subject: "Mathematics Problem Solving",
-                duration: 60,
-                topics: ["Word problems", "Number patterns", "Basic algebra concepts"]
-            },
-            4: {
-                subject: "English Comprehension",
-                duration: 60,
-                topics: ["Reading strategies", "Understanding main ideas", "Inference skills"]
-            },
-            5: {
-                subject: "Advanced Verbal Reasoning",
-                duration: 60,
-                topics: ["Complex analogies", "Logic puzzles", "Code breaking"]
-            },
-            6: {
-                subject: "Spatial Reasoning",
-                duration: 60,
-                topics: ["3D shapes", "Rotations and reflections", "Net folding"]
-            },
-            7: {
-                subject: "Mental Arithmetic",
-                duration: 60,
-                topics: ["Quick calculations", "Estimation", "Number bonds"]
-            },
-            8: {
-                subject: "Creative Writing",
-                duration: 60,
-                topics: ["Story structure", "Descriptive language", "Character development"]
-            },
-            9: {
-                subject: "Mixed Practice & Review",
-                duration: 60,
-                topics: ["Review all subjects", "Timed practice", "Exam strategies"]
-            },
-            10: {
-                subject: "Exam Techniques & Confidence Building",
-                duration: 60,
-                topics: ["Time management", "Dealing with nerves", "Final tips"]
-            }
+            1: { subject: "Introduction & Verbal Reasoning Basics", duration: 60, topics: ["Synonyms and antonyms", "Word relationships", "Simple analogies"] },
+            2: { subject: "Non-Verbal Reasoning Patterns", duration: 60, topics: ["Shape sequences", "Pattern completion", "Odd one out"] },
+            3: { subject: "Mathematics Problem Solving", duration: 60, topics: ["Word problems", "Number patterns", "Basic algebra concepts"] },
+            4: { subject: "English Comprehension", duration: 60, topics: ["Reading strategies", "Understanding main ideas", "Inference skills"] },
+            5: { subject: "Advanced Verbal Reasoning", duration: 60, topics: ["Complex analogies", "Logic puzzles", "Code breaking"] },
+            6: { subject: "Spatial Reasoning", duration: 60, topics: ["3D shapes", "Rotations and reflections", "Net folding"] },
+            7: { subject: "Mental Arithmetic", duration: 60, topics: ["Quick calculations", "Estimation", "Number bonds"] },
+            8: { subject: "Creative Writing", duration: 60, topics: ["Story structure", "Descriptive language", "Character development"] },
+            9: { subject: "Mixed Practice & Review", duration: 60, topics: ["Review all subjects", "Timed practice", "Exam strategies"] },
+            10: { subject: "Exam Techniques & Confidence Building", duration: 60, topics: ["Time management", "Dealing with nerves", "Final tips"] }
         };
 
         function loadVoices() {
-            const voices = speechSynthesis.getVoices();
+            const voices = window.speechSynthesis.getVoices();
             const voiceSelect = document.getElementById('voiceSelect');
             voiceSelect.innerHTML = '';
-            
-            // Show ALL English voices without filtering
             const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-            
             englishVoices.forEach((voice, index) => {
                 const option = document.createElement('option');
                 option.value = index;
                 option.textContent = voice.name;
                 voiceSelect.appendChild(option);
             });
-            
             if (englishVoices.length > 0) {
-                // Try to load saved voice preference
                 const savedVoiceName = localStorage.getItem('preferred_voice_name');
                 if (savedVoiceName) {
                     const savedIndex = englishVoices.findIndex(v => v.name === savedVoiceName);
@@ -570,8 +516,6 @@ html<!DOCTYPE html>
                 } else {
                     selectedVoice = englishVoices[0];
                 }
-                
-                // Load saved speed preference
                 const savedSpeed = localStorage.getItem('preferred_speech_speed');
                 if (savedSpeed) {
                     speechRate = parseFloat(savedSpeed);
@@ -580,18 +524,16 @@ html<!DOCTYPE html>
             }
         }
 
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = loadVoices;
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
         }
         loadVoices();
 
         function updateVoice() {
             const voiceSelect = document.getElementById('voiceSelect');
-            const voices = speechSynthesis.getVoices();
+            const voices = window.speechSynthesis.getVoices();
             const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
             selectedVoice = englishVoices[voiceSelect.value];
-            
-            // Save voice preference
             if (selectedVoice) {
                 localStorage.setItem('preferred_voice_name', selectedVoice.name);
             }
@@ -599,7 +541,6 @@ html<!DOCTYPE html>
 
         function updateSpeed() {
             speechRate = parseFloat(document.getElementById('speedSelect').value);
-            // Save speed preference
             localStorage.setItem('preferred_speech_speed', speechRate.toString());
         }
 
@@ -612,34 +553,27 @@ html<!DOCTYPE html>
 
         function speak(text) {
             if (!speechEnabled || !text) return;
-            
             stopSpeaking();
-            
             const cleanText = text.replace(/[📚🎯💬📊💾🎨⏱️🔧🔊👩‍🏫]/g, '').trim();
-            
             currentUtterance = new SpeechSynthesisUtterance(cleanText);
             currentUtterance.voice = selectedVoice;
             currentUtterance.rate = speechRate;
             currentUtterance.pitch = 1.0;
             currentUtterance.volume = 1.0;
-            
             currentUtterance.onstart = () => {
                 document.getElementById('voiceIndicator').classList.add('speaking');
             };
-            
             currentUtterance.onend = () => {
                 document.getElementById('voiceIndicator').classList.remove('speaking');
             };
-            
             currentUtterance.onerror = () => {
                 document.getElementById('voiceIndicator').classList.remove('speaking');
             };
-            
-            speechSynthesis.speak(currentUtterance);
+            window.speechSynthesis.speak(currentUtterance);
         }
 
         function stopSpeaking() {
-            speechSynthesis.cancel();
+            window.speechSynthesis.cancel();
             document.getElementById('voiceIndicator').classList.remove('speaking');
         }
 
@@ -662,12 +596,10 @@ html<!DOCTYPE html>
         function saveApiKey() {
             const input = document.getElementById('apiKeyInput');
             const key = input.value.trim();
-            
             if (!key.startsWith('sk-ant-api')) {
                 alert('Please enter a valid Anthropic API key (starts with sk-ant-api)');
                 return;
             }
-            
             apiKey = key;
             localStorage.setItem('anthropic_api_key', key);
             hideSetupPanel();
@@ -704,8 +636,7 @@ html<!DOCTYPE html>
             const elapsed = Math.floor((Date.now() - lessonStartTime) / 1000);
             const minutes = Math.floor(elapsed / 60);
             const seconds = elapsed % 60;
-            document.getElementById('timer').textContent = 
-                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
         function updateProgress(percentage) {
@@ -718,20 +649,16 @@ html<!DOCTYPE html>
                 alert('Please ask your parent to set up the API key first!');
                 return;
             }
-
             conversationHistory = [];
             document.getElementById('chatContainer').innerHTML = '';
             document.getElementById('userInput').disabled = false;
             document.getElementById('sendBtn').disabled = false;
             stopSpeaking();
-            
             lessonStartTime = Date.now();
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
             updateProgress(0);
-
             const lesson = lessonPlans[currentWeek];
-            
             const systemPrompt = `You are a warm, encouraging tutor helping a 9-year-old girl prepare for her 11+ entrance exam in December. Your responses will be read aloud by text-to-speech, so write naturally as if speaking.
 
 Today's lesson (Week ${currentWeek}): ${lesson.subject}
@@ -754,75 +681,51 @@ GUIDELINES:
 After each response include [PROGRESS: XX%]
 
 Start with a warm greeting! Ask her name if week 1.`;
-
             await sendTutorMessage(systemPrompt, true);
         }
 
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const message = input.value.trim();
-            
             if (!message) return;
-
             addMessage('student', message);
             input.value = '';
             input.disabled = true;
             document.getElementById('sendBtn').disabled = true;
-
-            conversationHistory.push({
-                role: 'user',
-                content: message
-            });
-
+            conversationHistory.push({ role: 'user', content: message });
             await sendTutorMessage();
         }
 
         async function sendTutorMessage(systemPrompt = null, isStart = false) {
             const loading = document.getElementById('loading');
             loading.classList.add('active');
-
             try {
                 const messages = isStart ? [] : [...conversationHistory];
-                
                 const response = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         apiKey: apiKey,
                         model: 'claude-sonnet-4-20250514',
                         max_tokens: 1000,
                         system: systemPrompt || `Continue tutoring session for 9-year-old preparing for 11+ exams. Responses will be read aloud. Include [PROGRESS: XX%].`,
-                        messages: messages.length > 0 ? messages : [
-                            { role: 'user', content: 'Start the lesson!' }
-                        ]
+                        messages: messages.length > 0 ? messages : [{ role: 'user', content: 'Start the lesson!' }]
                     })
                 });
-
                 if (!response.ok) {
                     const error = await response.json();
                     throw new Error(error.error?.message || 'API request failed');
                 }
-
                 const data = await response.json();
                 const tutorResponse = data.content[0].text;
-
                 const progressMatch = tutorResponse.match(/\[PROGRESS:\s*(\d+)%\]/);
                 if (progressMatch) {
                     updateProgress(parseInt(progressMatch[1]));
                 }
-
                 const displayText = tutorResponse.replace(/\[PROGRESS:\s*\d+%\]/g, '').trim();
-
-                conversationHistory.push({
-                    role: 'assistant',
-                    content: tutorResponse
-                });
-
+                conversationHistory.push({ role: 'assistant', content: tutorResponse });
                 addMessage('tutor', displayText);
                 speak(displayText);
-
             } catch (error) {
                 const errorMsg = 'Oops! I had a technical hiccup. Could you try again?';
                 addMessage('tutor', errorMsg);
@@ -840,22 +743,12 @@ Start with a warm greeting! Ask her name if week 1.`;
             const chatContainer = document.getElementById('chatContainer');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            
             if (sender === 'tutor') {
                 const escapedText = text.replace(/`/g, '\\`').replace(/\$/g, '\\$');
-                messageDiv.innerHTML = `
-                    <div class="tutor-avatar">👩‍🏫</div>
-                    <div class="message-content">
-                        ${text}
-                        <button class="replay-button" onclick="replayMessage(\`${escapedText}\`)">🔊</button>
-                    </div>
-                `;
+                messageDiv.innerHTML = `<div class="tutor-avatar">👩‍🏫</div><div class="message-content">${text}<button class="replay-button" onclick="replayMessage(\`${escapedText}\`)">🔊</button></div>`;
             } else {
-                messageDiv.innerHTML = `
-                    <div class="message-content">${text}</div>
-                `;
+                messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
             }
-            
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -877,18 +770,15 @@ Start with a warm greeting! Ask her name if week 1.`;
                 const progress = JSON.parse(saved);
                 const savedDate = new Date(progress.timestamp);
                 const formattedDate = savedDate.toLocaleDateString() + ' at ' + savedDate.toLocaleTimeString();
-                
                 if (confirm(`Found saved progress from ${formattedDate}. Continue?`)) {
                     conversationHistory = progress.history;
                     lessonProgress = progress.progress;
                     updateProgress(lessonProgress);
-                    
                     document.getElementById('chatContainer').innerHTML = '';
                     conversationHistory.forEach(msg => {
                         const cleanContent = msg.content.replace(/\[PROGRESS:\s*\d+%\]/g, '').trim();
                         addMessage(msg.role === 'user' ? 'student' : 'tutor', cleanContent);
                     });
-                    
                     if (apiKey) {
                         document.getElementById('userInput').disabled = false;
                         document.getElementById('sendBtn').disabled = false;
@@ -905,4 +795,4 @@ Start with a warm greeting! Ask her name if week 1.`;
         });
     </script>
 </body>
-</html
+</html>
